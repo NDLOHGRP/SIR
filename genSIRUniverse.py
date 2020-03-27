@@ -271,7 +271,18 @@ def view_pca_2(pca_model, universe_shape, show_shape=(3,3), punit=3):
         g.set_title("Explained variance ratio: {:0.2f}".format(pca_model.explained_variance_ratio_[n]))
         g.cax.colorbar(im)
     
+def view_components(model, universe_shape, show_shape=(3,3), punit=3): 
+    num_comp_to_show = show_shape[0]*show_shape[1] 
 
+    fig2 = plt.figure("model", figsize=(punit*show_shape[0], punit*show_shape[1]))
+    grid1 = ImageGrid(fig2, 111, nrows_ncols=show_shape, cbar_mode='each', 
+                  label_mode="L", axes_pad=[0.5,0.4], cbar_pad=0, share_all=True,aspect=True)
+    
+    for n,g in enumerate(grid1):
+        im = g.imshow(model.components_[n].reshape(*universe_shape), cmap='PiYG')
+        #g.set_title("Explained variance ratio: {:0.2f}".format(pca_model.explained_variance_ratio_[n]))
+        g.cax.colorbar(im)
+        
 class sir_universe(object):
     def __init__(self, universe_sh=(5,5), alpha=0.1, beta=0.8, gamma=0.2,
                  conn=None, init_inf_frac=0.1, 
@@ -363,8 +374,11 @@ class sir_universe(object):
                 axes[0].axhline(y=v[0], lw=1.5, c=v[1], label=k)
         if logscale:
             axes[0].set_yscale('log')
-        axes[0].legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
-          ncol=3, fancybox=True, shadow=True)
+            axes[0].legend(loc='lower center', bbox_to_anchor=(0.5, 1.05), 
+                           ncol=3, fancybox=True, shadow=True)
+        else:
+            axes[0].legend(loc='lower center', bbox_to_anchor=(0.5, 1.05), 
+                           ncol=3, fancybox=True, shadow=True)
         axes[0].set_xlabel('iteration')
         axes[0].set_ylabel('fraction')
 
