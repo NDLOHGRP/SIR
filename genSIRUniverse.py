@@ -343,18 +343,28 @@ class sir_universe(object):
         if verbose:
             print("{:d} iterations took {:0.3f}s".format(num_iters, time.time()-t0))
         
-    def show_state_vs_time(self):
+    def show_state_vs_time(self, logscale=False):
         tot_pop = self.pop.sum()
         tot_sus = self.np_state[:,0].sum(axis=1)/tot_pop
         tot_inf = self.np_state[:,1].sum(axis=1)/tot_pop 
         tot_rec = self.np_state[:,2].sum(axis=1)/tot_pop
+        asymp_sus = self.gamma/self.beta
+        asymp_inf = self.alpha*(self.beta-self.gamma)/self.beta/(self.alpha+self.gamma)
+        asymp_rec = 1 - asymp_sus - asymp_inf
         fig, axes = plt.subplots(1,3, figsize=(20,5))
         axes[0].plot(tot_sus, color='r', label="susceptible")
-        axes[0].plot(tot_inf, label="infected")
-        axes[0].plot(tot_rec, label="recovered")
-        axes[0].axhline(y=self.gamma/self.beta, lw=.5, color='#FF1199',label="gamma/beta")
-        #axes[0].set_yscale('log')
-        axes[0].legend()
+        axes[0].plot(tot_inf, color='teal', label="infected")
+        axes[0].plot(tot_rec, color='b', label="recovered")
+        asymp_dict = {'$S_\inf$':[asymp_sus,'lightsalmon'], 
+                      '$I_\inf$':[asymp_inf,'darkseagreen'], 
+                      '$R_\inf$':[asymp_rec,'mediumslateblue']}
+        for k,v in asymp_dict.items():
+            if v[0] > 0:
+                axes[0].axhline(y=v[0], lw=1.5, c=v[1], label=k)
+        if logscale:
+            axes[0].set_yscale('log')
+        axes[0].legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
+          ncol=3, fancybox=True, shadow=True)
         axes[0].set_xlabel('iteration')
         axes[0].set_ylabel('fraction')
 
